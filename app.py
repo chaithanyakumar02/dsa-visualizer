@@ -10,7 +10,9 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return render_template("index.html")
-
+@app.route("/tree")
+def tree():
+    return render_template("tree.html")
 @app.route("/api/trace", methods=["POST"])
 def trace():
     data = request.get_json()

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Visualizer — Tree</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">&lt;dsa.visualizer /&gt;</span>
+    <div style="display:flex; gap:8px;">
+      <a href="/" style="text-decoration:none;">
+        <button class="btn">Arrays</button>
+      </a>
+      <button class="btn active-nav">Trees</button>
+    </div>
+    <span class="nav-phase">Phase 3B — Trees</span>
+  </nav>
+
+  <div class="container">
+    <p class="page-title">Binary Search Tree</p>
+    <p class="page-sub">Insert values step by step, then visualize inorder, preorder, postorder and BFS traversals.</p>
+
+    <!-- ── Tree canvas ── -->
+    <div class="card">
+      <div style="overflow-x:auto; min-height: 200px;">
+        <svg id="tree-svg" width="100%" viewBox="0 0 600 300"
+             style="display:block; min-height:200px;"></svg>
+      </div>
+
+      <div class="step-info">
+        <span class="step-badge" id="tree-step-badge">step 0 / 0</span>
+        <span class="step-desc"  id="tree-step-desc">Enter values and click Insert.</span>
+      </div>
+
+      <div id="traversal-output"
+           style="font-family:monospace; font-size:13px; color:var(--green);
+                  margin-top:8px; min-height:20px;"></div>
+    </div>
+
+    <!-- ── Legend ── -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#7f77dd;border-radius:50%"></div>comparing path
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#1d9e75;border-radius:50%"></div>inserted / visited
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#ef9f27;border-radius:50%"></div>current node
+      </div>
+    </div>
+
+    <!-- ── Traversal tabs ── -->
+    <div class="algo-row" style="margin-bottom:1rem;">
+      <div class="algo-tabs" style="flex-wrap:wrap;">
+        <button class="algo-tab tree-tab active" data-mode="insert"
+                onclick="treeBuildInsert()">Insert</button>
+        <button class="algo-tab tree-tab" data-mode="inorder"
+                onclick="treeBuildTraversal('inorder')">Inorder</button>
+        <button class="algo-tab tree-tab" data-mode="preorder"
+                onclick="treeBuildTraversal('preorder')">Preorder</button>
+        <button class="algo-tab tree-tab" data-mode="postorder"
+                onclick="treeBuildTraversal('postorder')">Postorder</button>
+        <button class="algo-tab tree-tab" data-mode="bfs"
+                onclick="treeBuildTraversal('bfs')">BFS</button>
+      </div>
+    </div>
+
+    <!-- ── Controls ── -->
+    <div class="controls">
+      <button class="ctrl-btn" id="tree-btn-back" onclick="treeStepBack()">
+        <i class="ti ti-player-skip-back" aria-hidden="true"></i>
+      </button>
+      <button class="ctrl-btn play-btn" onclick="treeTogglePlay()">
+        <i class="ti ti-player-play" id="tree-play-icon" aria-hidden="true"></i>
+      </button>
+      <button class="ctrl-btn" id="tree-btn-fwd" onclick="treeStepFwd()">
+        <i class="ti ti-player-skip-forward" aria-hidden="true"></i>
+      </button>
+      <button class="ctrl-btn" onclick="treeBuildInsert()">
+        <i class="ti ti-refresh" aria-hidden="true"></i>
+      </button>
+      <div class="speed-wrap">
+        <i class="ti ti-brand-speedtest" aria-hidden="true" style="font-size:14px"></i>
+        <input type="range" min="1" max="5" value="3"
+               oninput="treeUpdateSpeed(this.value)">
+        <span id="tree-speed-label">×3</span>
+      </div>
+    </div>
+
+    <!-- ── Input ── -->
+    <div class="card">
+      <div class="input-row">
+        <input type="text" id="tree-input"
+               placeholder="Values to insert: 50, 30, 70, 20, 40"
+               value="50, 30, 70, 20, 40, 60, 80">
+        <button class="btn primary" onclick="treeBuildInsert()">Insert</button>
+        <button class="btn" onclick="treeRandom()">Random</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/tree.js') }}"></script>
+</body>
+</html>

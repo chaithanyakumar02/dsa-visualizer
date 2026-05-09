@@ -133,7 +133,16 @@
 
   <div id="gemini-status" style="font-size:13px; color: var(--muted); min-height:20px;"></div>
 </div>
-
+<nav>
+  <span class="nav-logo">&lt;dsa.visualizer /&gt;</span>
+  <div style="display:flex; gap:8px;">
+    <button class="btn active-nav">Arrays</button>
+    <a href="/tree" style="text-decoration:none;">
+      <button class="btn">Trees</button>
+    </a>
+  </div>
+  <span class="nav-phase">Phase 1 & 2</span>
+</nav>
   <script src="{{ url_for('static', filename='js/engine.js') }}"></script>
 </body>
 </html>

@@ -368,3 +368,8 @@ nav {
 .bar.in-window {
   border: 1px solid var(--accent) !important;
 }
+.active-nav {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
