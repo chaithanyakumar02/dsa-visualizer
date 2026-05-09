@@ -24,10 +24,14 @@
 
       <div class="algo-row">
         <div class="algo-tabs">
-          <button class="algo-tab active" data-algo="bubble"    onclick="setAlgo('bubble')">Bubble</button>
-          <button class="algo-tab"        data-algo="selection" onclick="setAlgo('selection')">Selection</button>
-          <button class="algo-tab"        data-algo="insertion" onclick="setAlgo('insertion')">Insertion</button>
-        </div>
+  <button class="algo-tab active" data-algo="bubble"    onclick="setAlgo('bubble')">Bubble</button>
+  <button class="algo-tab"        data-algo="selection" onclick="setAlgo('selection')">Selection</button>
+  <button class="algo-tab"        data-algo="insertion" onclick="setAlgo('insertion')">Insertion</button>
+  <button class="algo-tab"        data-algo="quick"     onclick="setAlgo('quick')">Quick</button>
+  <button class="algo-tab"        data-algo="merge"     onclick="setAlgo('merge')">Merge</button>
+  <button class="algo-tab"        data-algo="binary"    onclick="setAlgo('binary')">Binary Search</button>
+  <button class="algo-tab"        data-algo="two"       onclick="setAlgo('two')">Two Pointers</button>
+</div>
         <div class="complexity">
           <span id="complexity-time">Time: O(n²)</span>
           <span id="complexity-space">Space: O(1)</span>
@@ -88,14 +92,19 @@
 
     <!-- ── Custom array input ── -->
     <div class="card">
-      <div class="input-row">
-        <input type="text" id="arr-input"
-               placeholder="Enter numbers: 5, 2, 8, 1, 9, 3"
-               value="38, 27, 10, 54, 15, 42, 7, 33">
-        <button class="btn primary" onclick="buildSteps()">Apply</button>
-        <button class="btn" onclick="randomArray()">Random</button>
-      </div>
-    </div>
+  <div class="input-row">
+    <input type="text" id="arr-input"
+           placeholder="Enter numbers: 5, 2, 8, 1, 9, 3"
+           value="38, 27, 10, 54, 15, 42, 7, 33">
+    <button class="btn primary" onclick="buildSteps()">Apply</button>
+    <button class="btn" onclick="randomArray()">Random</button>
+  </div>
+  <div class="input-row" id="target-row" style="display:none; margin-top: 8px;">
+    <label style="font-size:13px; color:var(--muted); white-space:nowrap;">Target value:</label>
+    <input type="number" id="search-target" placeholder="e.g. 27" style="width:120px;">
+    <button class="btn primary" onclick="buildSteps()">Search</button>
+  </div>
+</div>
 
     <!-- ── Gemini panel (Phase 2 — now active) ── -->
 <div class="card">

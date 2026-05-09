@@ -365,3 +365,6 @@ nav {
 #user-code:focus {
   border-color: var(--accent);
 }
+.bar.in-window {
+  border: 1px solid var(--accent) !important;
+}
