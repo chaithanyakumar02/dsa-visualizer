@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Visualizer — Linked List</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/tabler-icons.min.css') }}">
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">&lt;<span>dsa</span>.visualizer /&gt;</span>
+    <div class="nav-links">
+      <a href="/"     style="text-decoration:none;"><button class="btn">Arrays</button></a>
+      <a href="/tree" style="text-decoration:none;"><button class="btn">Trees</button></a>
+      <button class="btn active-nav">Linked List</button>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="nav-phase">Linked List</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <i class="ti ti-sun" id="theme-icon" aria-hidden="true"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <div class="page-header">
+      <p class="page-title">Linked List</p>
+      <p class="page-sub">Visualize insertions, deletions, search and reversal step by step.</p>
+    </div>
+
+    <!-- ── Canvas ── -->
+    <div class="card" style="overflow-x:auto;">
+      <svg id="ll-svg" width="100%" viewBox="0 0 600 180"
+           style="display:block; min-height:160px;"></svg>
+      <div class="step-info">
+        <span class="step-badge" id="ll-step-badge">step 0 / 0</span>
+        <span class="step-desc"  id="ll-step-desc">Enter a value → pick an operation → press Run or Play.</span>
+      </div>
+    </div>
+
+    <!-- ── Legend ── -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#7c6fe0; border-radius:3px;"></div>current node
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#f5a623; border-radius:3px;"></div>pointer change
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#22c98a; border-radius:3px;"></div>inserted / found
+      </div>
+    </div>
+
+    <!-- ── Operation tabs ── -->
+    <div class="algo-row">
+      <div class="algo-tabs" style="flex-wrap:wrap;">
+        <button class="algo-tab ll-tab"        data-op="insert-head" onclick="buildOp('insert-head')">Insert Head</button>
+        <button class="algo-tab ll-tab active" data-op="insert-tail" onclick="buildOp('insert-tail')">Insert Tail</button>
+        <button class="algo-tab ll-tab"        data-op="insert-at"   onclick="buildOp('insert-at')">Insert At</button>
+        <button class="algo-tab ll-tab"        data-op="delete"      onclick="buildOp('delete')">Delete</button>
+        <button class="algo-tab ll-tab"        data-op="search"      onclick="buildOp('search')">Search</button>
+        <button class="algo-tab ll-tab"        data-op="reverse"     onclick="buildOp('reverse')">Reverse</button>
+      </div>
+    </div>
+
+    <!-- ── Controls ── -->
+    <div class="controls">
+      <button class="ctrl-btn" id="ll-btn-back" onclick="llStepBack()">
+        <i class="ti ti-player-skip-back" aria-hidden="true"></i>
+      </button>
+      <button class="ctrl-btn play-btn" onclick="llTogglePlay()">
+        <i class="ti ti-player-play" id="ll-play-icon" aria-hidden="true"></i>
+      </button>
+      <button class="ctrl-btn" id="ll-btn-fwd" onclick="llStepFwd()">
+        <i class="ti ti-player-skip-forward" aria-hidden="true"></i>
+      </button>
+      <button class="ctrl-btn" onclick="showInitialList('List reset.')" title="Reset">
+        <i class="ti ti-refresh" aria-hidden="true"></i>
+      </button>
+      <div class="speed-wrap">
+        <i class="ti ti-brand-speedtest" aria-hidden="true" style="font-size:14px"></i>
+        <input type="range" min="1" max="5" value="3" oninput="llUpdateSpeed(this.value)">
+        <span id="ll-speed-label">×3</span>
+      </div>
+    </div>
+
+    <div class="section-divider">list input</div>
+
+    <!-- ── Inputs ── -->
+    <div class="card">
+      <div class="input-row" style="flex-wrap:wrap; gap:8px;">
+        <input type="text" id="ll-input"
+               placeholder="Initial list: 10, 20, 30, 40"
+               value="10, 20, 30, 40, 50"
+               style="flex:2; min-width:180px;">
+        <input type="number" id="ll-val"
+               placeholder="Value"
+               style="width:90px;">
+        <input type="number" id="ll-pos"
+               placeholder="Position"
+               style="width:90px;">
+        <button class="btn primary" onclick="runCurrentOp()">Run</button>
+        <button class="btn" onclick="llRandom()">Random</button>
+      </div>
+      <p class="input-hint" style="margin-top:8px;">
+        1. Set initial list &nbsp;→&nbsp; 2. Pick operation tab &nbsp;→&nbsp; 3. Enter value &nbsp;→&nbsp; 4. Click <strong>Run</strong> or <strong>Play</strong>
+      </p>
+    </div>
+
+    <div class="section-divider">groq code parser</div>
+
+    <!-- ── Groq panel ── -->
+    <div class="card">
+      <div class="card-label">Any language — Groq detects structure automatically</div>
+      <textarea id="user-code"
+                placeholder="Paste your linked list code here..."
+                style="height:160px; margin-bottom:10px;"></textarea>
+      <div class="input-row" style="margin-bottom:10px;">
+        <input type="text" id="gemini-input"
+               placeholder="Input: 10,20,30,40"
+               style="flex:1;">
+        <button class="btn primary" onclick="runGroq()" id="gemini-btn">
+          <i class="ti ti-sparkles" aria-hidden="true"></i> Visualize My Code
+        </button>
+      </div>
+      <div id="gemini-status"></div>
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/linkedlist.js') }}"></script>
+</body>
+</html>

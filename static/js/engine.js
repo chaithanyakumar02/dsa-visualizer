@@ -402,25 +402,25 @@ function updateSpeed(v) {
 }
 
 // ── Phase 2: Groq integration ─────────────────────────────────────
-async function runGemini() {
+async function runGroq() {
   const code   = document.getElementById('user-code').value.trim();
   const input  = document.getElementById('gemini-input').value.trim();
   const status = document.getElementById('gemini-status');
   const btn    = document.getElementById('gemini-btn');
 
   if (!code)  { status.textContent = 'Please paste your code first.'; return; }
-  if (!input) { status.textContent = 'Please enter a test input array.'; return; }
+  if (!input) { status.textContent = 'Please enter a test input.';    return; }
 
-  btn.disabled    = true;
-  btn.textContent = 'Parsing with Groq...';
-  status.textContent  = 'Sending to Groq — this takes 3-5 seconds...';
-  status.style.color  = 'var(--amber)';
+  btn.disabled       = true;
+  btn.textContent    = 'Parsing with Groq...';
+  status.textContent = 'Sending to Groq — this takes 3-5 seconds...';
+  status.style.color = 'var(--amber)';
 
   try {
     const res = await fetch('/api/trace', {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, input })
+      body:    JSON.stringify({ code, input })
     });
 
     const data = await res.json();
@@ -431,15 +431,51 @@ async function runGemini() {
       return;
     }
 
-    steps = data.steps;
-    currentStep = 0;
-    if (steps.length > 0) {
-      document.getElementById('arr-input').value = steps[0].arr.join(', ');
-    }
-    stopPlay();
-    renderStep(0);
+    // route to the right visualizer based on detected type
+    if (data.type === 'array') {
+      if (typeof steps !== 'undefined') {
+        steps = data.steps;
+        currentStep = 0;
+        if (steps.length > 0) {
+          document.getElementById('arr-input').value = steps[0].arr.join(', ');
+        }
+        stopPlay();
+        renderStep(0);
+      } else {
+        window.location.href = '/?groq=' + encodeURIComponent(JSON.stringify(data));
+      }
 
-    status.textContent = `Groq generated ${steps.length} steps. Use controls above to step through.`;
+    } else if (data.type === 'tree') {
+      if (typeof treeSteps !== 'undefined') {
+        // convert Groq tree steps to our format
+        treeSteps = data.steps.map(s => ({
+          tree:      buildBSTFromArray(s.tree),
+          highlight: s.highlight || [],
+          inserted:  s.inserted  || null,
+          traversal: s.traversal || [],
+          desc:      s.desc
+        }));
+        treeStep = 0;
+        renderTree(0);
+      } else {
+        status.textContent = 'Tree code detected — switch to the Trees page to visualize it.';
+        status.style.color = 'var(--amber)';
+        return;
+      }
+
+    } else if (data.type === 'linkedlist') {
+      if (typeof llSteps !== 'undefined') {
+        llSteps = data.steps;
+        llStep  = 0;
+        renderLL(0);
+      } else {
+        status.textContent = 'Linked list code detected — switch to the Linked List page.';
+        status.style.color = 'var(--amber)';
+        return;
+      }
+    }
+
+    status.textContent = `Groq detected: ${data.type} — ${data.steps.length} steps generated.`;
     status.style.color = 'var(--green)';
 
   } catch (err) {
@@ -449,6 +485,14 @@ async function runGemini() {
     btn.disabled    = false;
     btn.textContent = 'Visualize My Code';
   }
+}
+
+// helper used by tree page to rebuild BST from value array
+function buildBSTFromArray(values) {
+  if (!values || !values.length) return new BST();
+  const bst = new BST();
+  values.forEach(v => bst.insert(v));
+  return bst;
 }
 
 // ── Init ──────────────────────────────────────────────────────────

@@ -1,47 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DSA Visualizer</title>
+  <title>DSA Visualizer — Arrays</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-</head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/tabler-icons.min.css') }}"></head>
 <body>
 
   <nav>
-    <span class="nav-logo">&lt;dsa.visualizer /&gt;</span>
-    <span class="nav-phase">Phase 1 — Sorting</span>
+    <span class="nav-logo">&lt;<span>dsa</span>.visualizer /&gt;</span>
+    <div class="nav-links">
+      <button class="btn active-nav">Arrays</button>
+      <a href="/tree"        style="text-decoration:none;"><button class="btn">Trees</button></a>
+      <a href="/linkedlist"  style="text-decoration:none;"><button class="btn">Linked List</button></a>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="nav-phase">Arrays & Search</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <i class="ti ti-sun" id="theme-icon" aria-hidden="true"></i>
+      </button>
+    </div>
   </nav>
 
   <div class="container">
 
-    <p class="page-title">Sorting Algorithms</p>
-    <p class="page-sub">Step through each comparison and swap. Use your own array or generate a random one.</p>
+    <div class="page-header">
+      <p class="page-title">Sorting & Search</p>
+      <p class="page-sub">Step through each comparison and swap. Paste your own code or use the built-in algorithms.</p>
+    </div>
 
     <!-- ── Main visualizer card ── -->
     <div class="card">
-
       <div class="algo-row">
         <div class="algo-tabs">
-  <button class="algo-tab active" data-algo="bubble"    onclick="setAlgo('bubble')">Bubble</button>
-  <button class="algo-tab"        data-algo="selection" onclick="setAlgo('selection')">Selection</button>
-  <button class="algo-tab"        data-algo="insertion" onclick="setAlgo('insertion')">Insertion</button>
-  <button class="algo-tab"        data-algo="quick"     onclick="setAlgo('quick')">Quick</button>
-  <button class="algo-tab"        data-algo="merge"     onclick="setAlgo('merge')">Merge</button>
-  <button class="algo-tab"        data-algo="binary"    onclick="setAlgo('binary')">Binary Search</button>
-  <button class="algo-tab"        data-algo="two"       onclick="setAlgo('two')">Two Pointers</button>
-</div>
+          <button class="algo-tab active" data-algo="bubble"    onclick="setAlgo('bubble')">Bubble</button>
+          <button class="algo-tab"        data-algo="selection" onclick="setAlgo('selection')">Selection</button>
+          <button class="algo-tab"        data-algo="insertion" onclick="setAlgo('insertion')">Insertion</button>
+          <button class="algo-tab"        data-algo="quick"     onclick="setAlgo('quick')">Quick</button>
+          <button class="algo-tab"        data-algo="merge"     onclick="setAlgo('merge')">Merge</button>
+          <button class="algo-tab"        data-algo="binary"    onclick="setAlgo('binary')">Binary Search</button>
+          <button class="algo-tab"        data-algo="two"       onclick="setAlgo('two')">Two Pointers</button>
+        </div>
         <div class="complexity">
           <span id="complexity-time">Time: O(n²)</span>
           <span id="complexity-space">Space: O(1)</span>
         </div>
       </div>
 
-      <!-- Bars -->
       <div class="bars-wrap" id="bars-container"></div>
 
-      <!-- Step description -->
       <div class="step-info">
         <span class="step-badge" id="step-badge">step 0 / 0</span>
         <span class="step-desc"  id="step-desc">Press play or step forward to begin.</span>
@@ -51,21 +61,11 @@
 
     <!-- ── Legend ── -->
     <div class="legend">
-      <div class="legend-item">
-        <div class="legend-dot" style="background:#ef9f27"></div>comparing
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background:#d85a30"></div>swapping
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background:#378add"></div>selected min
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background:#7f77dd"></div>pivot / key
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background:#1d9e75"></div>sorted
-      </div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f5a623"></div>comparing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e85d3a"></div>swapping</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4a9eff"></div>selected min</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#7c6fe0"></div>pivot / key</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#22c98a"></div>sorted</div>
     </div>
 
     <!-- ── Controls ── -->
@@ -84,65 +84,50 @@
       </button>
       <div class="speed-wrap">
         <i class="ti ti-brand-speedtest" aria-hidden="true" style="font-size:14px"></i>
-        <input type="range" min="1" max="5" value="3" id="speed-slider"
-               oninput="updateSpeed(this.value)">
+        <input type="range" min="1" max="5" value="3" id="speed-slider" oninput="updateSpeed(this.value)">
         <span id="speed-label">×3</span>
       </div>
     </div>
 
-    <!-- ── Custom array input ── -->
+    <div class="section-divider">array input</div>
+
+    <!-- ── Array input ── -->
     <div class="card">
-  <div class="input-row">
-    <input type="text" id="arr-input"
-           placeholder="Enter numbers: 5, 2, 8, 1, 9, 3"
-           value="38, 27, 10, 54, 15, 42, 7, 33">
-    <button class="btn primary" onclick="buildSteps()">Apply</button>
-    <button class="btn" onclick="randomArray()">Random</button>
-  </div>
-  <div class="input-row" id="target-row" style="display:none; margin-top: 8px;">
-    <label style="font-size:13px; color:var(--muted); white-space:nowrap;">Target value:</label>
-    <input type="number" id="search-target" placeholder="e.g. 27" style="width:120px;">
-    <button class="btn primary" onclick="buildSteps()">Search</button>
-  </div>
-</div>
+      <div class="input-row">
+        <input type="text" id="arr-input"
+               placeholder="Enter numbers: 5, 2, 8, 1, 9, 3"
+               value="38, 27, 10, 54, 15, 42, 7, 33"
+               style="flex:1;">
+        <button class="btn primary" onclick="buildSteps()">Apply</button>
+        <button class="btn" onclick="randomArray()">Random</button>
+      </div>
+      <div class="input-row" id="target-row" style="display:none; margin-top:10px;">
+        <label style="font-size:13px; color:var(--muted); white-space:nowrap; font-family:'JetBrains Mono',monospace;">Target:</label>
+        <input type="number" id="search-target" placeholder="e.g. 27" style="width:120px;">
+        <button class="btn primary" onclick="buildSteps()">Search</button>
+      </div>
+    </div>
 
-    <!-- ── Gemini panel (Phase 2 — now active) ── -->
-<div class="card">
-  <div class="card-label">PHASE 2 — GEMINI CODE PARSER</div>
-  <p class="page-sub" style="margin-bottom: 1rem;">
-    Paste any Python sorting function below. Gemini will parse it and visualize it step by step.
-  </p>
+    <div class="section-divider">groq code parser</div>
 
-  <textarea id="user-code" placeholder="def bubble_sort(arr):
-    n = len(arr)
-    for i in range(n-1):
-        for j in range(n-i-1):
-            if arr[j] > arr[j+1]:
-                arr[j], arr[j+1] = arr[j+1], arr[j]
-    return arr" style="width:100%; height:160px; margin-bottom:10px;"></textarea>
+    <!-- ── Groq panel ── -->
+    <div class="card">
+      <div class="card-label">Any language — Groq detects structure automatically</div>
+      <textarea id="user-code" placeholder="Paste your sorting, BST, or linked list code here...
+Supports Python, Java, C++, JavaScript and more." style="height:160px; margin-bottom:10px;"></textarea>
+      <div class="input-row" style="margin-bottom:10px;">
+        <input type="text" id="gemini-input"
+               placeholder="Input: 5,2,8,1 or 50,30,70 or 10,20,30"
+               style="flex:1;">
+        <button class="btn primary" onclick="runGroq()" id="gemini-btn">
+          <i class="ti ti-sparkles" aria-hidden="true"></i> Visualize My Code
+        </button>
+      </div>
+      <div id="gemini-status"></div>
+    </div>
 
-  <div class="input-row" style="margin-bottom: 10px;">
-    <input type="text" id="gemini-input"
-           placeholder="Input array: 5, 2, 8, 1, 9, 3"
-           value="5, 2, 8, 1, 9, 3"
-           style="flex:1">
-    <button class="btn primary" onclick="runGemini()" id="gemini-btn">
-      Visualize My Code
-    </button>
   </div>
 
-  <div id="gemini-status" style="font-size:13px; color: var(--muted); min-height:20px;"></div>
-</div>
-<nav>
-  <span class="nav-logo">&lt;dsa.visualizer /&gt;</span>
-  <div style="display:flex; gap:8px;">
-    <button class="btn active-nav">Arrays</button>
-    <a href="/tree" style="text-decoration:none;">
-      <button class="btn">Trees</button>
-    </a>
-  </div>
-  <span class="nav-phase">Phase 1 & 2</span>
-</nav>
   <script src="{{ url_for('static', filename='js/engine.js') }}"></script>
 </body>
 </html>

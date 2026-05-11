@@ -10,13 +10,19 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return render_template("index.html")
+
 @app.route("/tree")
 def tree():
     return render_template("tree.html")
+
+@app.route("/linkedlist")
+def linkedlist():
+    return render_template("linkedlist.html")
+
 @app.route("/api/trace", methods=["POST"])
 def trace():
-    data = request.get_json()
-    code       = data.get("code", "").strip()
+    data       = request.get_json()
+    code       = data.get("code",  "").strip()
     test_input = data.get("input", "").strip()
 
     if not code or not test_input:
@@ -26,7 +32,7 @@ def trace():
         result = get_trace(code, test_input)
         if isinstance(result, dict) and "error" in result:
             return jsonify(result), 500
-        return jsonify({"steps": result})
+        return jsonify(result)
     except Exception as e:
         print("ERROR:", str(e))
         return jsonify({"error": str(e)}), 500
