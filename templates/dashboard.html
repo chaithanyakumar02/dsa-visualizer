@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Visualizer — Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/tabler-icons.min.css') }}">
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+    .stat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .session-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .session-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+    }
+    .session-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .session-table tr:last-child td { border-bottom: none; }
+    .session-table tr:hover td { background: var(--surface2); }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+    }
+    .badge-array      { background: rgba(74,158,255,0.15);  color: #4a9eff; }
+    .badge-tree       { background: rgba(34,201,138,0.15);  color: #22c98a; }
+    .badge-linkedlist { background: rgba(124,111,224,0.15); color: #7c6fe0; }
+    .badge-done       { background: rgba(34,201,138,0.15);  color: #22c98a; }
+    .badge-partial    { background: rgba(245,166,35,0.15);  color: #f5a623; }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+    }
+    .empty-state i { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.3; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">&lt;<span>dsa</span>.visualizer /&gt;</span>
+    <div class="nav-links">
+      <a href="/"           style="text-decoration:none;"><button class="btn">Arrays</button></a>
+      <a href="/tree"       style="text-decoration:none;"><button class="btn">Trees</button></a>
+      <a href="/linkedlist" style="text-decoration:none;"><button class="btn">Linked List</button></a>
+      <button class="btn active-nav">Dashboard</button>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="nav-phase" style="font-size:11px;">{{ user.email }}</span>
+      <a href="/logout" style="text-decoration:none;">
+        <button class="btn" style="font-size:12px; padding:6px 12px;">Sign out</button>
+      </a>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="ti ti-sun" id="theme-icon"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <div class="page-header">
+      <p class="page-title">Your Practice Dashboard</p>
+      <p class="page-sub">Track your DSA practice history and progress.</p>
+    </div>
+
+    <!-- ── Stats ── -->
+    <div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-num">{{ sessions | length }}</div>
+    <div class="stat-label">Total sessions</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">
+      {{ sessions | selectattr('completed', 'equalto', true) | list | length }}
+    </div>
+    <div class="stat-label">Completed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">
+      {{ sessions | selectattr('type', 'equalto', 'array') | list | length }}
+    </div>
+    <div class="stat-label">Array sessions</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">
+      {{ sessions | selectattr('type', 'equalto', 'tree') | list | length }}
+    </div>
+    <div class="stat-label">Tree sessions</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">
+      {{ sessions | selectattr('type', 'equalto', 'linkedlist') | list | length }}
+    </div>
+    <div class="stat-label">Linked List sessions</div>
+  </div>
+</div>
+
+    <!-- ── History table ── -->
+    <div class="card">
+      <div class="card-label">Practice history</div>
+
+      {% if sessions %}
+      <table class="session-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Algorithm</th>
+            <th>Input</th>
+            <th>Steps</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sessions %}
+          <tr>
+            <td>
+              <span class="badge badge-{{ s.type }}">{{ s.type }}</span>
+            </td>
+            <td style="font-family: monospace;">{{ s.algorithm }}</td>
+            <td style="color: var(--muted); font-family: monospace; font-size:12px;">
+              {{ s.input_data[:30] }}{% if s.input_data|length > 30 %}…{% endif %}
+            </td>
+            <td style="font-family: monospace;">{{ s.steps_count }}</td>
+            <td>
+              {% if s.completed %}
+                <span class="badge badge-done">done</span>
+              {% else %}
+                <span class="badge badge-partial">partial</span>
+              {% endif %}
+            </td>
+            <td style="color: var(--muted); font-size:12px;">
+              {{ s.created_at[:10] }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% else %}
+      <div class="empty-state">
+        <i class="ti ti-chart-bar" aria-hidden="true"></i>
+        <p>No sessions yet.</p>
+        <p style="font-size:13px; margin-top:4px;">Start practicing to see your history here.</p>
+        <a href="/" style="text-decoration:none;">
+          <button class="btn primary" style="margin-top:1rem;">Start practicing</button>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</body>
+</html>

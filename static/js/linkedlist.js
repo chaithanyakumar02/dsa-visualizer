@@ -265,6 +265,7 @@ function buildOp(op) {
 
   llStep = 0;
   renderLL(0);
+  if (llSteps.length > 1) saveSession('linkedlist', op, document.getElementById('ll-input').value, llSteps.length, false);
 }
 
 function runCurrentOp() {
@@ -414,10 +415,12 @@ function startLL() {
 }
 
 function stopLL() {
-  clearInterval(llTimer);
-  llTimer = null;
+  clearInterval(llTimer); llTimer = null;
   const icon = document.getElementById('ll-play-icon');
   if (icon) icon.className = 'ti ti-player-play';
+  if (llSteps.length > 0 && llStep >= llSteps.length - 1) {
+    saveSession('linkedlist', currentOp, document.getElementById('ll-input').value, llSteps.length, true);
+  }
 }
 
 function llUpdateSpeed(v) {
@@ -484,7 +487,23 @@ async function runGroq() {
     btn.textContent = 'Visualize My Code';
   }
 }
-
+async function saveSession(type, algorithm, inputData, stepsCount, completed) {
+  try {
+    await fetch('/api/save-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type,
+        algorithm,
+        input_data: inputData,
+        steps_count: stepsCount,
+        completed
+      })
+    });
+  } catch (e) {
+    console.log('Session save failed:', e);
+  }
+}
 // ── Init ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   showInitialList('Enter a value → pick an operation → press Run or Play.');

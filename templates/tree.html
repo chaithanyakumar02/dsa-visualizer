@@ -11,19 +11,23 @@
 <body>
 
   <nav>
-    <span class="nav-logo">&lt;<span>dsa</span>.visualizer /&gt;</span>
+  <span class="nav-logo">&lt;<span>dsa</span>.visualizer /&gt;</span>
     <div class="nav-links">
       <a href="/"           style="text-decoration:none;"><button class="btn">Arrays</button></a>
       <button class="btn active-nav">Trees</button>
       <a href="/linkedlist" style="text-decoration:none;"><button class="btn">Linked List</button></a>
+      <a href="/dashboard"  style="text-decoration:none;"><button class="btn">Dashboard</button></a>
     </div>
-    <div style="display:flex; align-items:center; gap:10px;">
-      <span class="nav-phase">Trees</span>
-      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-        <i class="ti ti-sun" id="theme-icon" aria-hidden="true"></i>
-      </button>
-    </div>
-  </nav>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <span class="nav-phase">{{ user.email }}</span>
+    <a href="/logout" style="text-decoration:none;">
+      <button class="btn" style="font-size:12px; padding:6px 12px;">Sign out</button>
+    </a>
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <i class="ti ti-sun" id="theme-icon"></i>
+    </button>
+  </div>
+</nav>
 
   <div class="container">
 

@@ -256,6 +256,7 @@ function treeBuildInsert() {
   treeSteps = genInsertSteps(vals);
   treeStep  = 0;
   renderTree(0);
+  saveSession('tree', 'bst-insert', document.getElementById('tree-input').value, treeSteps.length, false);
 }
 
 function treeBuildTraversal(mode) {
@@ -277,6 +278,7 @@ function treeBuildTraversal(mode) {
   document.querySelectorAll('.tree-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.mode === mode);
   });
+  saveSession('tree', mode, document.getElementById('tree-input').value, treeSteps.length, false);
 }
 
 function treeStepFwd() {
@@ -288,9 +290,13 @@ function treeStepBack() {
   if (treeStep > 0) { treeStep--; renderTree(treeStep); }
 }
 
-function treeTogglePlay() {
-  if (treeTimer) stopTree();
-  else startTree();
+function stopTree() {
+  clearInterval(treeTimer); treeTimer = null;
+  const icon = document.getElementById('tree-play-icon');
+  if (icon) icon.className = 'ti ti-player-play';
+  if (treeSteps.length > 0 && treeStep >= treeSteps.length - 1) {
+    saveSession('tree', 'bst', document.getElementById('tree-input').value, treeSteps.length, true);
+  }
 }
 
 function startTree() {
@@ -413,6 +419,23 @@ function buildBSTFromArray(values) {
   const bst = new BST();
   values.forEach(v => bst.insert(v));
   return bst;
+}
+async function saveSession(type, algorithm, inputData, stepsCount, completed) {
+  try {
+    await fetch('/api/save-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type,
+        algorithm,
+        input_data: inputData,
+        steps_count: stepsCount,
+        completed
+      })
+    });
+  } catch (e) {
+    console.log('Session save failed:', e);
+  }
 }
 document.addEventListener('DOMContentLoaded', () => {
   treeBuildInsert();

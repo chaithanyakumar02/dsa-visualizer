@@ -300,6 +300,7 @@ function buildSteps() {
 
   currentStep = 0;
   renderStep(0);
+  saveSession('array', currentAlgo, document.getElementById('arr-input').value, steps.length, false);
 }
 
 function renderStep(idx) {
@@ -352,8 +353,13 @@ function getPointerLabel(s, i) {
 
 // ── Playback ──────────────────────────────────────────────────────
 function stepForward() {
-  if (currentStep < steps.length - 1) { currentStep++; renderStep(currentStep); }
-  else stopPlay();
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    renderStep(currentStep);
+    if (currentStep === steps.length - 1) {
+      saveSession('array', currentAlgo, document.getElementById('arr-input').value, steps.length, true);
+    }
+  } else stopPlay();
 }
 
 function stepBack() {
@@ -375,9 +381,13 @@ function startPlay() {
 }
 
 function stopPlay() {
-  clearInterval(playTimer); playTimer = null;
+  clearInterval(playTimer);
+  playTimer = null;
   const icon = document.getElementById('play-icon');
   if (icon) icon.className = 'ti ti-player-play';
+  if (steps.length > 0 && currentStep >= steps.length - 1) {
+    saveSession('array', currentAlgo, document.getElementById('arr-input').value, steps.length, true);
+  }
 }
 
 function resetVis() {
@@ -494,6 +504,22 @@ function buildBSTFromArray(values) {
   values.forEach(v => bst.insert(v));
   return bst;
 }
-
+async function saveSession(type, algorithm, inputData, stepsCount, completed) {
+  try {
+    await fetch('/api/save-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type,
+        algorithm,
+        input_data: inputData,
+        steps_count: stepsCount,
+        completed
+      })
+    });
+  } catch (e) {
+    console.log('Session save failed:', e);
+  }
+}
 // ── Init ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', buildSteps);
