@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from dotenv import load_dotenv
-from gemini.parser import get_trace
+from groq.parser import get_trace
 from auth.supabase_client import supabase
 import os
 
